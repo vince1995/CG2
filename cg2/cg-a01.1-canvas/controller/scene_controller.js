@@ -89,6 +89,7 @@ define(["util", "Scene"],
          *
          */
         SceneController.prototype.onSelection = function (func) {
+            console.log("selected");
             this.selectCallback = func;
         };
 

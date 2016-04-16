@@ -86,9 +86,9 @@ define(["jquery", "Line", "Circle"],
                     color: randomColor()
                 };
                 
-                var radius = Math.floor(Math.random()*100)+1;
+                var radius = Math.floor(Math.random()*100)+5;
                 
-                var circle = new Circle([randomX(),randomY()], radius, style);
+                var circle = new Circle([randomX(),randomY()], radius, style, true);
                 scene.addObjects([circle]);
                 
                 //deselect all objects, then select the newly created circle
@@ -98,6 +98,25 @@ define(["jquery", "Line", "Circle"],
                 
                 
             }));
+            
+            $("#btnNewPoint").click( (function(){
+                
+                //create the actual point and add it to the scene
+                var style = {
+                    color: randomColor()
+                };
+                
+                var radius = Math.floor((Math.random() * 10) + 5);
+                var point = new Circle([randomX(),randomY()], radius, style, false);
+                scene.addObjects([point]);
+                
+                //deselect all objects, then select the newly created circle
+                sceneController.deselect();
+                sceneController.select(point);
+                
+                
+            }));
+            
 
 
         };

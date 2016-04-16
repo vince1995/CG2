@@ -1,15 +1,7 @@
 /*
- * JavaScript / Canvas teaching framwork 
- * (C)opyright Hartmut Schirmacher, hschirmacher.beuth-hochschule.de
- * changes by Kristian Hildebrand, khildebrand@beuth-hochschule.de
- *
- * Module: straight_line
- *
- * A StraighLine knows how to draw itself into a specified 2D context,
- * can tell whether a certain mouse position "hits" the object,
- * and implements the function createDraggers() to create a set of
- * draggers to manipulate itself.
- *
+ * Author: Vincent Helmreich
+ * created on: 15.04.2016
+ * last edit: 16.04.2016
  */
 
 
@@ -20,18 +12,22 @@ define(["util", "vec2", "Scene", "PointDragger"],
         "use strict";
 
         /**
-         *  A simple straight line that can be dragged
-         *  around by its endpoints.
+         *  A simple circle or point that can be dragged
+         *  around by its middle point.
          *  Parameters:
-         *  - point0 and point1: array objects representing [x,y] coordinates of start and end point
+         *  - point0: array object representing [x,y] coordinates of the middle
          *  - lineStyle: object defining width and color attributes for line drawing,
          *       begin of the form { width: 2, color: "#00FF00" }
+         *  - radius: the radius of the circle
+         *  - circleOrPoint: if it's a circle or point (true: circle, false: point)
          */
 
-        var Circle = function (point0, radius, lineStyle) {
+        var Circle = function (point0, radius, lineStyle, bool) {
 
-            console.log("creating circle with middle point at: " +
-                       point0[0] + "," + point0[1] + ", radius: " + radius);
+            if(bool)
+                console.log("creating circle with middle point at: " + point0[0] + "," + point0[1] + ", radius: " + radius);
+            else
+                console.log("creating point with middle point at: " + point0[0] + "," + point0[1] + ", radius: " + radius);
 
             // draw style for drawing the line
             this.lineStyle = lineStyle || {width: "2", color: "#0000AA"};
@@ -41,6 +37,9 @@ define(["util", "vec2", "Scene", "PointDragger"],
             
             //the radius of the circle
             this.radius = radius;
+            
+            //if it's a circle or point (true: circle, false: point)
+            this.circleOrPoint = bool ||false;
             
         };
 
@@ -55,34 +54,33 @@ define(["util", "vec2", "Scene", "PointDragger"],
            
 
             // set drawing style
-            context.lineWidth = this.lineStyle.width;
-            context.strokeStyle = this.lineStyle.color;
+            
 
+            
             // actually start drawing
-            context.stroke();
+            if(this.circleOrPoint){
+                context.lineWidth = this.lineStyle.width;
+                context.strokeStyle = this.lineStyle.color;
+                context.stroke();
+            }else{
+                context.fillStyle= this.lineStyle.color;
+                context.fill();
+            }
+            
+            
 
         };
 
         // test whether the mouse position is on this line segment
         Circle.prototype.isHit = function (context, pos) {
-            /*
-            // project point on line, get parameter of that projection point
-            var t = vec2.projectPointOnLine(pos, this.p0, this.p1);
-            console.log("t:", t);
-            // outside the line segment?
-            if (t < 0.0 || t > 1.0) {
-                return false;
-            }
-
-            // coordinates of the projected point
-            var p = vec2.add(this.p0, vec2.mult(vec2.sub(this.p1, this.p0), t));
-
-            // distance of the point from the line
-            var d = vec2.length(vec2.sub(p, pos));
-
-            // allow 2 pixels extra "sensitivity"
-            return d <= (this.lineStyle.width / 2) + 2;
-            */
+            
+            //calculate the length between middle point and click position
+            var t = vec2.length([this.p0[0]-pos[0],this.p0[1]-pos[1]]);
+            
+            //first line: return for points
+            //second line: return for circles
+            return ((!this.circleOrPoint && t<this.radius+2)||
+                    ( this.radius-this.lineStyle.width-2<t && t<this.radius+this.lineStyle.width+2 ));
         };
 
         // return list of draggers to manipulate this line
